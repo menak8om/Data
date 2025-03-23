@@ -1,1 +1,100 @@
-ht
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <title>عرض جميع البيانات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl; /* لجعل النصوص من اليمين إلى اليسار */
+            background-color: #f9f9f9;
+            margin: 20px;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+        .box {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>جميع البيانات من JSON</h1>
+
+        <!-- مكان عرض البيانات -->
+        <div id="app"></div>
+    </div>
+
+    <script>
+        // تم تغيير الملف إلى data1.json
+        fetch('data1.json')
+            .then(response => response.json()) // تحويل الرد إلى JSON
+            .then(data => {
+                const appDiv = document.getElementById('app');
+
+                // عرض معلومات التطبيق
+                appDiv.innerHTML += `
+                    <div class="box">
+                        <h2>معلومات التطبيق</h2>
+                        <p><strong>اسم التطبيق:</strong> ${data.app_name}</p>
+                        <p><strong>الإصدار:</strong> ${data.version}</p>
+                    </div>
+                `;
+
+                // عرض المنتجات
+                appDiv.innerHTML += `<h2>المنتجات</h2>`;
+                data.products.forEach(product => {
+                    appDiv.innerHTML += `
+                        <div class="box">
+                            <p><strong>اسم المنتج:</strong> ${product.name}</p>
+                            <p><strong>السعر:</strong> ${product.price} $</p>
+                            <p><strong>التصنيف:</strong> ${product.category}</p>
+                            <p><strong>متوفر:</strong> ${product.in_stock ? 'نعم' : 'لا'}</p>
+                            <p><strong>التقييم:</strong> ${product.rating} ⭐</p>
+                        </div>
+                    `;
+                });
+
+                // عرض المستخدمين
+                appDiv.innerHTML += `<h2>المستخدمون</h2>`;
+                data.users.forEach(user => {
+                    appDiv.innerHTML += `
+                        <div class="box">
+                            <p><strong>اسم المستخدم:</strong> ${user.name}</p>
+                            <p><strong>البريد الإلكتروني:</strong> ${user.email}</p>
+                            <p><strong>الحالة:</strong> ${user.is_active ? 'نشط' : 'غير نشط'}</p>
+                        </div>
+                    `;
+                });
+
+                // عرض الإعدادات
+                appDiv.innerHTML += `
+                    <div class="box">
+                        <h2>الإعدادات</h2>
+                        <p><strong>العملة:</strong> ${data.settings.currency}</p>
+                        <p><strong>اللغة:</strong> ${data.settings.language}</p>
+                        <p><strong>البريد للدعم:</strong> ${data.settings.support_email}</p>
+                    </div>
+                `;
+            })
+            .catch(error => {
+                console.error('حدث خطأ أثناء تحميل البيانات:', error);
+                document.getElementById('app').innerHTML = '<p>فشل تحميل البيانات.</p>';
+            });
+    </script>
+
+</body>
+
+</html>
