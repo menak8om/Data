@@ -1,0 +1,57 @@
+{
+  "app_name": "متجر إلكتروني",
+  "version": "1.0.0",
+  "products": [
+    {
+      "id": 1,
+      "name": "هاتف ذكي",
+      "price": 350.99,
+      "category": "الإلكترونيات",
+      "in_stock": true,
+      "rating": 4.5
+    },
+    {
+      "id": 2,
+      "name": "سماعات لاسلكية",
+      "price": 120.50,
+      "category": "الإكسسوارات",
+      "in_stock": false,
+      "rating": 4.2
+    },
+    {
+      "id": 3,
+      "name": "حاسوب محمول",
+      "price": 1250.00,
+      "category": "الإلكترونيات",
+      "in_stock": true,
+      "rating": 4.8
+    },
+    {
+      "id": 4,
+      "name": "ساعة ذكية",
+      "price": 220.75,
+      "category": "الإكسسوارات",
+      "in_stock": true,
+      "rating": 4.6
+    }
+  ],
+  "users": [
+    {
+      "user_id": 101,
+      "name": "أحمد علي",
+      "email": "ahmed@example.com",
+      "is_active": true
+    },
+    {
+      "user_id": 102,
+      "name": "فاطمة محمد",
+      "email": "fatima@example.com",
+      "is_active": false
+    }
+  ],
+  "settings": {
+    "currency": "USD",
+    "language": "ar",
+    "support_email": "support@example.com"
+  }
+}
