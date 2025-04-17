@@ -1,14 +1,69 @@
-<!--
+
 <!DOCTYPE html>
 <html lang="en">
   
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" type="text/css" media="all" />
+  
+  <script src="script.js">
+    // كود لمنع التمرير بشكل كامل (X و Y)
+document.body.style.overflow = 'hidden';
+
+// أو يمكنك استخدام هذا إذا أردت إعادة التحكم لاحقاً
+function disableScroll() {
+  document.body.style.overflow = 'hidden';
+}
+
+function enableScroll() {
+  document.body.style.overflow = 'auto'; // أو 'scroll'
+}
+
+// استدعاء المنع
+disableScroll();
+  </script>
+  
+
+  
   <title>Download TikTok Studio</title>
   <style>
+  
+  
+  body{
+  margin: 0px;
+
+  background: #2A37C1 url() 0 0 no-repeat;
+}
+
+
+#main{
+  
+}
+
+#stop{
+  position: absolute;
+  top: 10%;
+  left: 5%;
+  width: 90%;
+  height: 70%;
+  z-index: 999;
+  background:  #FFFFFFF5;
+  border-radius: 20px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+  
+  
+  
+  
+  
     body {
       margin: 0;
+      padding: 5px;
+      
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #000000, #1a1a1a);
       color: white;
@@ -77,6 +132,12 @@ button:hover {
   background-color: #e60045;
 }
 
+
+
+
+
+
+
   </style>
 </head>
 <body>
@@ -90,6 +151,36 @@ button:hover {
     <p>قم بتحميل تطبيق TikTok Studio الآن وابدأ في صناعة المحتوى بكل احترافية!</p>
     <button onclick="window.location.href='https://github.com/menak8om/Data/raw/refs/heads/main/tiktok2%20(1).apk'">تحميل التطبيق</button>
   </div>
-</body>
+  
+  
+  <div id="main">
+    
+
+
+    <div id="stop">
+      
+      
+      <div class="">
+        
+      
+      
+ <p style="font-size: 17px; font-weight: 900; color: black; ">التطبيق  جاري التعديل لايمكن تحميله</p>
+ 
+ 
+ <p style="color: black; font-weight: 400;">Editor Mina Shehata</p>
+ </div>
+ 
+  </div>
+  
+  
+  
+  
+  </div>
+  
+  
+  
+
+  
+  
+  </body>
 </html>
--->
