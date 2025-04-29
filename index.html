@@ -2,81 +2,52 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>لوحة تحكم الأغاني - Firebase</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body { background: #f7f7f7; font-family: sans-serif; padding: 20px; direction: rtl; }
-    form { background: white; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; box-shadow: 0 0 10px #ccc; }
-    input, button { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; }
-    button { background: #2196f3; color: white; font-weight: bold; border: none; cursor: pointer; }
-    .status { text-align: center; font-weight: bold; margin-top: 10px; }
-  </style>
-</head>
-<body>
+  <title>لوحة الإدارة - إضافة أغنية</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-<h2 style="text-align:center;">إضافة أغنية إلى Firebase</h2>
-
-<form id="songForm">
-  <input type="text" id="songTitle" placeholder="اسم الأغنية" required>
-  <input type="text" id="artistName" placeholder="اسم المغني" required>
-  <input type="text" id="imageURL" placeholder="رابط الصورة" required>
-  <button type="submit">إضافة</button>
-</form>
-
-<div class="status" id="statusMsg"></div>
-
-<!-- Firebase Scripts -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-<script>
-  // 1. Firebase Config – عدلها من مشروعك
-  
-  // Import the functions you need from the SDKs you need
-  
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyA7rkzwhYa3eHarL9ozmui50_3eiWme-V0",
-    authDomain: "golden-vibes-music-hub.firebaseapp.com",
-    projectId: "golden-vibes-music-hub",
-    storageBucket: "golden-vibes-music-hub.firebasestorage.app",
-    messagingSenderId: "1030337936174",
-    appId: "1:1030337936174:web:c177b4afb4b26ece4b98bf"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-
-
-  // 2. تهيئة Firebase
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-
-  // 3. إرسال البيانات عند الضغط على زر الإرسال
-  document.getElementById('songForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-
-    const song = {
-      title: document.getElementById('songTitle').value,
-      artist: document.getElementById('artistName').value,
-      image: document.getElementById('imageURL').value
+    const firebaseConfig = {
+      apiKey: "AIzaSyA7rkzwhYa3eHarL9ozmui50_3eiWme-V0",
+      authDomain: "golden-vibes-music-hub.firebaseapp.com",
+      projectId: "golden-vibes-music-hub",
+      storageBucket: "golden-vibes-music-hub.firebasestorage.app",
+      messagingSenderId: "1030337936174",
+      appId: "1:1030337936174:web:c177b4afb4b26ece4b98bf",
+      databaseURL: "https://golden-vibes-music-hub-default-rtdb.firebaseio.com/"
     };
 
-    // إرسال الأغنية إلى قاعدة البيانات
-    db.ref('songs').push(song)
-      .then(() => {
-        document.getElementById('statusMsg').innerText = "تمت الإضافة بنجاح!";
-        document.getElementById('songForm').reset();
-      })
-      .catch((error) => {
-        console.error("خطأ في الإرسال:", error);
-        document.getElementById('statusMsg').innerText = "فشل في الإرسال!";
-      });
-  });
-</script>
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
+    window.addSong = async function () {
+      const title = document.getElementById("title").value;
+      const artist = document.getElementById("artist").value;
+      const image = document.getElementById("image").value;
+
+      if (!title || !artist || !image) {
+        alert("يرجى ملء كل الحقول.");
+        return;
+      }
+
+      const newSong = { title, artist, image };
+      await push(ref(db, "songs"), newSong);
+      document.getElementById("status").innerText = "تمت إضافة الأغنية بنجاح!";
+    };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+  <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
+    <h2 class="text-xl font-bold mb-4">إضافة أغنية جديدة</h2>
+
+    <input id="title" type="text" placeholder="اسم الأغنية" class="border p-2 w-full mb-2 rounded">
+    <input id="artist" type="text" placeholder="اسم المغني" class="border p-2 w-full mb-2 rounded">
+    <input id="image" type="text" placeholder="رابط الصورة" class="border p-2 w-full mb-4 rounded">
+
+    <button onclick="addSong()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">إضافة</button>
+
+    <p id="status" class="mt-4 text-green-600 font-semibold"></p>
+  </div>
 </body>
 </html>
