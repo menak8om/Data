@@ -31,15 +31,25 @@
 
 <script>
   // 1. Firebase Config – عدلها من مشروعك
+  
+  // Import the functions you need from the SDKs you need
+  
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "SENDER_ID",
-    appId: "APP_ID"
+    apiKey: "AIzaSyA7rkzwhYa3eHarL9ozmui50_3eiWme-V0",
+    authDomain: "golden-vibes-music-hub.firebaseapp.com",
+    projectId: "golden-vibes-music-hub",
+    storageBucket: "golden-vibes-music-hub.firebasestorage.app",
+    messagingSenderId: "1030337936174",
+    appId: "1:1030337936174:web:c177b4afb4b26ece4b98bf"
   };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+
 
   // 2. تهيئة Firebase
   firebase.initializeApp(firebaseConfig);
