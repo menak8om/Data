@@ -1,186 +1,72 @@
-
 <!DOCTYPE html>
-<html lang="en">
-  
+<html lang="ar">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" type="text/css" media="all" />
-  
-  <script src="script.js">
-    // كود لمنع التمرير بشكل كامل (X و Y)
-document.body.style.overflow = 'hidden';
-
-// أو يمكنك استخدام هذا إذا أردت إعادة التحكم لاحقاً
-function disableScroll() {
-  document.body.style.overflow = 'hidden';
-}
-
-function enableScroll() {
-  document.body.style.overflow = 'auto'; // أو 'scroll'
-}
-
-// استدعاء المنع
-disableScroll();
-  </script>
-  
-
-  
-  <title>Download TikTok Studio</title>
+  <meta charset="UTF-8">
+  <title>لوحة تحكم الأغاني - Firebase</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-  
-  
-  body{
-  margin: 0px;
-
-  background: #2A37C1 url() 0 0 no-repeat;
-}
-
-
-#main{
-  
-}
-
-#stop{
-  position: absolute;
-  top: 10%;
-  left: 5%;
-  width: 90%;
-  height: 70%;
-  z-index: 999;
-  background:  #FFFFFFF5;
-  border-radius: 20px;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-  
-  
-  
-  
-  
-    body {
-      margin: 0;
-      padding: 5px;
-      
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #000000, #1a1a1a);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-     height: 90vh;
-      flex-direction: column;
-      text-align: center;
-    }header {
-  width: 99%;
-  padding: 20px;
-  background-color: #0f0f0f;
-  box-shadow: 0 2px 10px rgba(255, 0, 80, 0.2);
-  text-align: center;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 1.8rem;
-  color: #ff0050;
-}
-
-header span {
-  color: #aaa;
-  font-size: 0.9rem;
-}
-
-.card {
-  background-color: #111;
-  border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 0 25px rgba(255, 0, 102, 0.3);
-  max-width: 99%;
-}
-
-.card img {
-  width: 100px;
-  height: auto;
-  margin-bottom: 20px;
-}
-
-h2 {
-  margin-bottom: 20px;
-  font-size: 1.5rem;
-}
-
-p {
-  margin-bottom: 30px;
-  font-size: 1rem;
-  color: #ccc;
-}
-
-button {
-  background-color: #ff0050;
-  border: none;
-  border-radius: 30px;
-  padding: 15px 30px;
-  font-size: 1rem;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-button:hover {
-  background-color: #e60045;
-}
-
-
-
-
-
-
-
+    body { background: #f7f7f7; font-family: sans-serif; padding: 20px; direction: rtl; }
+    form { background: white; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; box-shadow: 0 0 10px #ccc; }
+    input, button { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; }
+    button { background: #2196f3; color: white; font-weight: bold; border: none; cursor: pointer; }
+    .status { text-align: center; font-weight: bold; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <header>
-    <h1>TikTok Studio</h1>
-    <span>الإصدار: 1.0.0</span>
-  </header>  
-  <div class="card">
-    <img src="https://raw.githubusercontent.com/menak8om/Data/refs/heads/main/ic_launcher.png" alt="TikTok Studio Logo" />
-    <h2>تطبيق TikTok Studio</h2>
-    <p>قم بتحميل تطبيق TikTok Studio الآن وابدأ في صناعة المحتوى بكل احترافية!</p>
-    <button onclick="window.location.href='https://github.com/menak8om/Data/raw/refs/heads/main/tiktok2%20(1).apk'">تحميل التطبيق</button>
-  </div>
-  
-  
-  <div id="main">
-    
 
+<h2 style="text-align:center;">إضافة أغنية إلى Firebase</h2>
 
-    <div id="stop">
-      
-      
-      <div class="">
-        
-      
-      
- <p style="font-size: 17px; font-weight: 900; color: black; ">التطبيق  جاري التعديل لايمكن تحميله</p>
- 
- 
- <p style="color: black; font-weight: 400;">Editor Mina Shehata</p>
- </div>
- 
-  </div>
-  
-  
-  
-  
-  </div>
-  
-  
-  
+<form id="songForm">
+  <input type="text" id="songTitle" placeholder="اسم الأغنية" required>
+  <input type="text" id="artistName" placeholder="اسم المغني" required>
+  <input type="text" id="imageURL" placeholder="رابط الصورة" required>
+  <button type="submit">إضافة</button>
+</form>
 
-  
-  
-  </body>
+<div class="status" id="statusMsg"></div>
+
+<!-- Firebase Scripts -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+  // 1. Firebase Config – عدلها من مشروعك
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "SENDER_ID",
+    appId: "APP_ID"
+  };
+
+  // 2. تهيئة Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // 3. إرسال البيانات عند الضغط على زر الإرسال
+  document.getElementById('songForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const song = {
+      title: document.getElementById('songTitle').value,
+      artist: document.getElementById('artistName').value,
+      image: document.getElementById('imageURL').value
+    };
+
+    // إرسال الأغنية إلى قاعدة البيانات
+    db.ref('songs').push(song)
+      .then(() => {
+        document.getElementById('statusMsg').innerText = "تمت الإضافة بنجاح!";
+        document.getElementById('songForm').reset();
+      })
+      .catch((error) => {
+        console.error("خطأ في الإرسال:", error);
+        document.getElementById('statusMsg').innerText = "فشل في الإرسال!";
+      });
+  });
+</script>
+
+</body>
 </html>
