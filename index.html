@@ -27,7 +27,6 @@
     const db = getDatabase(app);
     const songsRef = ref(db, "songs");
 
-    // إضافة أغنية جديدة
     window.addSong = async function () {
       const title = document.getElementById("title").value;
       const artist = document.getElementById("artist").value;
@@ -46,14 +45,12 @@
       document.getElementById("form").reset();
     };
 
-    // حذف أغنية
     window.deleteSong = async function (id) {
       if (confirm("هل أنت متأكد أنك تريد حذف هذه الأغنية؟")) {
         await remove(ref(db, `songs/${id}`));
       }
     };
 
-    // عرض الأغاني مع مشغل
     onValue(songsRef, (snapshot) => {
       const container = document.getElementById("songsContainer");
       container.innerHTML = "";
@@ -65,27 +62,28 @@
         count++;
 
         const songDiv = document.createElement("div");
-        songDiv.className = "bg-white shadow p-4 mb-4 rounded-lg cursor-pointer hover:bg-gray-100 transition";
+        songDiv.className = "bg-white shadow-md p-4 mb-4 rounded-lg transition hover:shadow-lg";
 
         songDiv.innerHTML = `
-          <div class="flex justify-between items-center">
+          <div class="flex justify-between items-center mb-2">
             <div>
-              <p class="font-bold">${song.title}</p>
-              <p class="text-sm text-gray-600">${song.artist}</p>
+              <p class="text-lg font-bold">${song.title}</p>
+              <p class="text-sm text-gray-500">${song.artist}</p>
+              <a href="${song.link}" target="_blank" class="text-blue-600 text-sm underline break-all">${song.link}</a>
             </div>
             <div class="flex items-center gap-2">
-              <img src="${song.image}" alt="صورة" class="w-12 h-12 rounded object-cover border" />
+              <img src="${song.image}" alt="صورة" class="w-14 h-14 rounded-lg object-cover border">
               <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
                 onclick="event.stopPropagation(); deleteSong('${id}')">حذف</button>
             </div>
           </div>
 
-          <div class="hidden mt-4 border-t pt-4" id="player-${id}">
+          <div class="hidden mt-3 border-t pt-3" id="player-${id}">
             <div class="flex gap-4 items-center">
               <img src="${song.image}" alt="صورة" class="w-16 h-16 rounded object-cover border" />
               <div>
-                <h4 class="font-bold">${song.title}</h4>
-                <p class="text-sm text-gray-600">${song.artist}</p>
+                <h4 class="font-semibold">${song.title}</h4>
+                <p class="text-sm text-gray-500">${song.artist}</p>
               </div>
             </div>
             <audio controls class="w-full mt-2">
@@ -96,9 +94,7 @@
         `;
 
         songDiv.addEventListener("click", () => {
-          // إغلاق جميع المشغلات أولاً
           document.querySelectorAll("[id^='player-']").forEach(p => p.classList.add("hidden"));
-          // ثم فتح المشغل المحدد إذا لم يكن مفتوح
           const player = songDiv.querySelector(`#player-${id}`);
           player.classList.toggle("hidden");
         });
@@ -112,23 +108,23 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-6">
-  <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow" dir="rtl">
-    <h2 class="text-xl font-bold mb-4">إضافة أغنية جديدة</h2>
+<body class="bg-gradient-to-br from-yellow-50 to-white min-h-screen p-6">
+  <div class="max-w-xl mx-auto bg-white p-6 rounded-lg shadow" dir="rtl">
+    <h2 class="text-2xl font-bold mb-4 text-center text-yellow-700">إضافة أغنية جديدة</h2>
 
-    <form id="form">
-      <input id="title" type="text" placeholder="اسم الأغنية" class="border p-2 w-full mb-2 rounded">
-      <input id="artist" type="text" placeholder="اسم المغني" class="border p-2 w-full mb-2 rounded">
-      <input id="image" type="text" placeholder="رابط الصورة" class="border p-2 w-full mb-2 rounded">
-      <input id="link" type="text" placeholder="رابط الأغنية (لينك خارجي)" class="border p-2 w-full mb-4 rounded">
-      <button type="button" onclick="addSong()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full">إضافة</button>
+    <form id="form" class="space-y-3">
+      <input id="title" type="text" placeholder="اسم الأغنية" class="border p-2 w-full rounded">
+      <input id="artist" type="text" placeholder="اسم المغني" class="border p-2 w-full rounded">
+      <input id="image" type="text" placeholder="رابط الصورة" class="border p-2 w-full rounded">
+      <input id="link" type="text" placeholder="رابط الأغنية (لينك خارجي)" class="border p-2 w-full rounded">
+      <button type="button" onclick="addSong()" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 w-full">إضافة</button>
     </form>
 
-    <p id="status" class="mt-4 text-green-600 font-semibold"></p>
+    <p id="status" class="mt-4 text-green-600 font-semibold text-center"></p>
   </div>
 
-  <div class="max-w-md mx-auto mt-6">
-    <h3 id="count" class="text-lg font-bold mb-2 text-center">عدد الأغاني: 0</h3>
+  <div class="max-w-xl mx-auto mt-8">
+    <h3 id="count" class="text-xl font-bold mb-4 text-center text-gray-700">عدد الأغاني: 0</h3>
     <div id="songsContainer"></div>
   </div>
 </body>
