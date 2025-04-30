@@ -46,10 +46,17 @@
       document.getElementById("form").reset();
     };
 
-    // عرض الأغاني
+    // حذف أغنية
+    window.deleteSong = async function (id) {
+      if (confirm("هل أنت متأكد أنك تريد حذف هذه الأغنية؟")) {
+        await remove(ref(db, `songs/${id}`));
+      }
+    };
+
+    // عرض الأغاني مع مشغل
     onValue(songsRef, (snapshot) => {
       const container = document.getElementById("songsContainer");
-      container.innerHTML = ""; // تنظيف القائمة
+      container.innerHTML = "";
       const songs = snapshot.val();
       let count = 0;
 
@@ -58,32 +65,49 @@
         count++;
 
         const songDiv = document.createElement("div");
-        songDiv.className = "bg-white shadow p-4 mb-4 rounded-lg flex items-center justify-between cursor-pointer hover:bg-gray-100 transition";
-        songDiv.onclick = () => window.open(song.link, "_blank");
+        songDiv.className = "bg-white shadow p-4 mb-4 rounded-lg cursor-pointer hover:bg-gray-100 transition";
 
         songDiv.innerHTML = `
-          <div>
-            <p class="font-bold">${song.title}</p>
-            <p class="text-sm text-gray-600">${song.artist}</p>
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="font-bold">${song.title}</p>
+              <p class="text-sm text-gray-600">${song.artist}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <img src="${song.image}" alt="صورة" class="w-12 h-12 rounded object-cover border" />
+              <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                onclick="event.stopPropagation(); deleteSong('${id}')">حذف</button>
+            </div>
           </div>
-          <div class="flex items-center gap-2">
-            <img src="${song.image}" alt="صورة" class="w-12 h-12 rounded object-cover border" />
-            <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" onclick="event.stopPropagation(); deleteSong('${id}')">حذف</button>
+
+          <div class="hidden mt-4 border-t pt-4" id="player-${id}">
+            <div class="flex gap-4 items-center">
+              <img src="${song.image}" alt="صورة" class="w-16 h-16 rounded object-cover border" />
+              <div>
+                <h4 class="font-bold">${song.title}</h4>
+                <p class="text-sm text-gray-600">${song.artist}</p>
+              </div>
+            </div>
+            <audio controls class="w-full mt-2">
+              <source src="${song.link}" type="audio/mpeg">
+              متصفحك لا يدعم تشغيل الصوت.
+            </audio>
           </div>
         `;
+
+        songDiv.addEventListener("click", () => {
+          // إغلاق جميع المشغلات أولاً
+          document.querySelectorAll("[id^='player-']").forEach(p => p.classList.add("hidden"));
+          // ثم فتح المشغل المحدد إذا لم يكن مفتوح
+          const player = songDiv.querySelector(`#player-${id}`);
+          player.classList.toggle("hidden");
+        });
 
         container.appendChild(songDiv);
       }
 
       document.getElementById("count").innerText = `عدد الأغاني: ${count}`;
     });
-
-    // حذف أغنية
-    window.deleteSong = async function (id) {
-      if (confirm("هل أنت متأكد أنك تريد حذف هذه الأغنية؟")) {
-        await remove(ref(db, `songs/${id}`));
-      }
-    };
   </script>
 
   <script src="https://cdn.tailwindcss.com"></script>
