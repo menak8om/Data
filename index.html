@@ -2,7 +2,7 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>لوحة الإدارة - إدارة الأغاني</title>
+  <title>لوحة الإدارة - إضافة أغنية</title>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import {
@@ -25,79 +25,87 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
+    const songsRef = ref(db, "songs");
 
+    // إضافة أغنية جديدة
     window.addSong = async function () {
       const title = document.getElementById("title").value;
       const artist = document.getElementById("artist").value;
       const image = document.getElementById("image").value;
+      const link = document.getElementById("link").value;
 
-      if (!title || !artist || !image) {
+      if (!title || !artist || !image || !link) {
         alert("يرجى ملء كل الحقول.");
         return;
       }
 
-      const newSong = { title, artist, image };
-      await push(ref(db, "songs"), newSong);
+      const newSong = { title, artist, image, link };
+      await push(songsRef, newSong);
+
       document.getElementById("status").innerText = "تمت إضافة الأغنية بنجاح!";
+      document.getElementById("form").reset();
     };
 
-    const container = document.getElementById("songs-container");
-    const countElement = document.getElementById("song-count");
+    // عرض الأغاني
+    onValue(songsRef, (snapshot) => {
+      const container = document.getElementById("songsContainer");
+      container.innerHTML = ""; // تنظيف القائمة
+      const songs = snapshot.val();
+      let count = 0;
 
-    function displaySongs() {
-      const songsRef = ref(db, "songs");
-      onValue(songsRef, (snapshot) => {
-        const data = snapshot.val();
-        container.innerHTML = ""; // تفريغ العناصر
-        let count = 0;
+      for (const id in songs) {
+        const song = songs[id];
+        count++;
 
-        for (let id in data) {
-          count++;
+        const songDiv = document.createElement("div");
+        songDiv.className = "bg-white shadow p-4 mb-4 rounded-lg flex items-center justify-between cursor-pointer hover:bg-gray-100 transition";
+        songDiv.onclick = () => window.open(song.link, "_blank");
 
-          const song = data[id];
-          const songDiv = document.createElement("div");
-          songDiv.className = "bg-white shadow p-4 mb-4 rounded-lg flex items-center justify-between";
+        songDiv.innerHTML = `
+          <div>
+            <p class="font-bold">${song.title}</p>
+            <p class="text-sm text-gray-600">${song.artist}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <img src="${song.image}" alt="صورة" class="w-12 h-12 rounded object-cover border" />
+            <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" onclick="event.stopPropagation(); deleteSong('${id}')">حذف</button>
+          </div>
+        `;
 
-          songDiv.innerHTML = `
-            <div>
-              <p class="font-bold">${song.title}</p>
-              <p class="text-sm text-gray-600">${song.artist}</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <img src="${song.image}" alt="صورة" class="w-12 h-12 rounded object-cover border" />
-              <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" onclick="deleteSong('${id}')">حذف</button>
-            </div>
-          `;
-          container.appendChild(songDiv);
-        }
+        container.appendChild(songDiv);
+      }
 
-        countElement.innerText = `عدد الأغاني: ${count}`;
-      });
-    }
+      document.getElementById("count").innerText = `عدد الأغاني: ${count}`;
+    });
 
-    window.deleteSong = function (id) {
-      if (confirm("هل أنت متأكد من حذف هذه الأغنية؟")) {
-        remove(ref(db, `songs/${id}`));
+    // حذف أغنية
+    window.deleteSong = async function (id) {
+      if (confirm("هل أنت متأكد أنك تريد حذف هذه الأغنية؟")) {
+        await remove(ref(db, `songs/${id}`));
       }
     };
-
-    displaySongs(); // تحميل الأغاني عند الفتح
   </script>
+
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-6">
-  <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow mb-8">
+  <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow" dir="rtl">
     <h2 class="text-xl font-bold mb-4">إضافة أغنية جديدة</h2>
-    <input id="title" type="text" placeholder="اسم الأغنية" class="border p-2 w-full mb-2 rounded">
-    <input id="artist" type="text" placeholder="اسم المغني" class="border p-2 w-full mb-2 rounded">
-    <input id="image" type="text" placeholder="رابط الصورة" class="border p-2 w-full mb-4 rounded">
-    <button onclick="addSong()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">إضافة</button>
+
+    <form id="form">
+      <input id="title" type="text" placeholder="اسم الأغنية" class="border p-2 w-full mb-2 rounded">
+      <input id="artist" type="text" placeholder="اسم المغني" class="border p-2 w-full mb-2 rounded">
+      <input id="image" type="text" placeholder="رابط الصورة" class="border p-2 w-full mb-2 rounded">
+      <input id="link" type="text" placeholder="رابط الأغنية (لينك خارجي)" class="border p-2 w-full mb-4 rounded">
+      <button type="button" onclick="addSong()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full">إضافة</button>
+    </form>
+
     <p id="status" class="mt-4 text-green-600 font-semibold"></p>
   </div>
 
-  <div class="max-w-md mx-auto">
-    <h3 id="song-count" class="text-lg font-semibold mb-4">عدد الأغاني: 0</h3>
-    <div id="songs-container"></div>
+  <div class="max-w-md mx-auto mt-6">
+    <h3 id="count" class="text-lg font-bold mb-2 text-center">عدد الأغاني: 0</h3>
+    <div id="songsContainer"></div>
   </div>
 </body>
 </html>
