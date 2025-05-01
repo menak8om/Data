@@ -1,8 +1,101 @@
+
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>لوحة الإدارة - إضافة أغنية</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إدارة الأغاني - Golden Vibes</title>
+  
+  <!-- الخطوط والأيقونات -->
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    * {
+      font-family: 'Tajawal', sans-serif;
+    }
+    
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    
+    .neumorphic {
+      box-shadow: 12px 12px 24px #d1d5db, 
+                  -12px -12px 24px #ffffff;
+    }
+    
+    .song-card {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .song-card:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-amber-50 to-amber-100 min-h-screen p-4 md:p-6">
+  <div class="max-w-2xl mx-auto">
+    <!-- قسم الإضافة -->
+    <div class="glass-effect neumorphic rounded-xl p-6 mb-8">
+      <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center text-amber-700">
+        <span class="material-icons-round align-middle text-4xl mr-2">library_music</span>
+        إضافة أغنية جديدة
+      </h2>
+
+      <form id="form" class="space-y-4">
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-600">اسم الأغنية</label>
+          <input id="title" type="text" 
+                 class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-600">الفنان</label>
+          <input id="artist" type="text" 
+                 class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-600">رابط الصورة</label>
+          <input id="image" type="text" 
+                 class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-gray-600">رابط الأغنية</label>
+          <input id="link" type="text" 
+                 class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all">
+        </div>
+
+        <button type="button" onclick="addSong()" 
+                class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-3 px-6 rounded-lg 
+                       flex items-center justify-center gap-2 transition-all active:scale-95">
+          <span class="material-icons-round">add_circle</span>
+          إضافة الأغنية
+        </button>
+      </form>
+
+      <p id="status" class="mt-4 text-center text-sm font-medium text-emerald-600"></p>
+    </div>
+
+    <!-- قائمة الأغاني -->
+    <div class="glass-effect neumorphic rounded-xl p-6">
+      <h3 id="count" class="text-xl font-bold mb-6 text-center text-gray-700 flex items-center justify-center gap-2">
+        <span class="material-icons-round">queue_music</span>
+        عدد الأغاني: <span id="countNumber">0</span>
+      </h3>
+
+      <div id="songsContainer" class="space-y-4"></div>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import {
@@ -27,6 +120,7 @@
     const db = getDatabase(app);
     const songsRef = ref(db, "songs");
 
+    // إضافة أغنية جديدة
     window.addSong = async function () {
       const title = document.getElementById("title").value;
       const artist = document.getElementById("artist").value;
@@ -34,98 +128,27 @@
       const link = document.getElementById("link").value;
 
       if (!title || !artist || !image || !link) {
-        alert("يرجى ملء كل الحقول.");
+        showAlert("يرجى ملء كل الحقول", "error");
         return;
       }
 
-      const newSong = { title, artist, image, link };
-      await push(songsRef, newSong);
+      const newSong = { 
+        title, 
+        artist, 
+        image, 
+        link,
+        timestamp: new Date().toISOString()
+      };
 
-      document.getElementById("status").innerText = "تمت إضافة الأغنية بنجاح!";
-      document.getElementById("form").reset();
+      try {
+        await push(songsRef, newSong);
+        showAlert("تمت إضافة الأغنية بنجاح!", "success");
+        document.getElementById("form").reset();
+      } catch (error) {
+        showAlert("حدث خطأ أثناء الإضافة", "error");
+      }
     };
 
+    // حذف أغنية
     window.deleteSong = async function (id) {
-      if (confirm("هل أنت متأكد أنك تريد حذف هذه الأغنية؟")) {
-        await remove(ref(db, `songs/${id}`));
-      }
-    };
-
-    onValue(songsRef, (snapshot) => {
-      const container = document.getElementById("songsContainer");
-      container.innerHTML = "";
-      const songs = snapshot.val();
-      let count = 0;
-
-      for (const id in songs) {
-        const song = songs[id];
-        count++;
-
-        const songDiv = document.createElement("div");
-        songDiv.className = "bg-white shadow-md p-4 mb-4 rounded-lg transition hover:shadow-lg";
-
-        songDiv.innerHTML = `
-          <div class="flex justify-between items-center mb-2">
-            <div>
-              <p class="text-lg font-bold">${song.title}</p>
-              <p class="text-sm text-gray-500">${song.artist}</p>
-              <a href="${song.link}" target="_blank" class="text-blue-600 text-sm underline break-all">${song.link}</a>
-            </div>
-            <div class="flex items-center gap-2">
-              <img src="${song.image}" alt="صورة" class="w-14 h-14 rounded-lg object-cover border">
-              <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                onclick="event.stopPropagation(); deleteSong('${id}')">حذف</button>
-            </div>
-          </div>
-
-          <div class="hidden mt-3 border-t pt-3" id="player-${id}">
-            <div class="flex gap-4 items-center">
-              <img src="${song.image}" alt="صورة" class="w-16 h-16 rounded object-cover border" />
-              <div>
-                <h4 class="font-semibold">${song.title}</h4>
-                <p class="text-sm text-gray-500">${song.artist}</p>
-              </div>
-            </div>
-            <audio controls class="w-full mt-2">
-              <source src="${song.link}" type="audio/mpeg">
-              متصفحك لا يدعم تشغيل الصوت.
-            </audio>
-          </div>
-        `;
-
-        songDiv.addEventListener("click", () => {
-          document.querySelectorAll("[id^='player-']").forEach(p => p.classList.add("hidden"));
-          const player = songDiv.querySelector(`#player-${id}`);
-          player.classList.toggle("hidden");
-        });
-
-        container.appendChild(songDiv);
-      }
-
-      document.getElementById("count").innerText = `عدد الأغاني: ${count}`;
-    });
-  </script>
-
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gradient-to-br from-yellow-50 to-white min-h-screen p-6">
-  <div class="max-w-xl mx-auto bg-white p-6 rounded-lg shadow" dir="rtl">
-    <h2 class="text-2xl font-bold mb-4 text-center text-yellow-700">إضافة أغنية جديدة</h2>
-
-    <form id="form" class="space-y-3">
-      <input id="title" type="text" placeholder="اسم الأغنية" class="border p-2 w-full rounded">
-      <input id="artist" type="text" placeholder="اسم المغني" class="border p-2 w-full rounded">
-      <input id="image" type="text" placeholder="رابط الصورة" class="border p-2 w-full rounded">
-      <input id="link" type="text" placeholder="رابط الأغنية (لينك خارجي)" class="border p-2 w-full rounded">
-      <button type="button" onclick="addSong()" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 w-full">إضافة</button>
-    </form>
-
-    <p id="status" class="mt-4 text-green-600 font-semibold text-center"></p>
-  </div>
-
-  <div class="max-w-xl mx-auto mt-8">
-    <h3 id="count" class="text-xl font-bold mb-4 text-center text-gray-700">عدد الأغاني: 0</h3>
-    <div id="songsContainer"></div>
-  </div>
-</body>
-</html>
+      if (confirm("هل أنت متأكد من الحذف
