@@ -1,300 +1,131 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Golden Vibe Music</title>
-  <meta name="description" content="Golden Vibe Music - أحدث الأغاني.">
-  <meta name="keywords" content="موسيقى, أغاني, حديثة">
-  
-  
-  
+  <meta charset="UTF-8">
+  <title>لوحة الإدارة - إضافة أغنية</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import {
+      getDatabase,
+      ref,
+      push,
+      onValue,
+      remove
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA7rkzwhYa3eHarL9ozmui50_3eiWme-V0",
+      authDomain: "golden-vibes-music-hub.firebaseapp.com",
+      projectId: "golden-vibes-music-hub",
+      storageBucket: "golden-vibes-music-hub.firebasestorage.app",
+      messagingSenderId: "1030337936174",
+      appId: "1:1030337936174:web:c177b4afb4b26ece4b98bf",
+      databaseURL: "https://golden-vibes-music-hub-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const songsRef = ref(db, "songs");
+
+    window.addSong = async function () {
+      const title = document.getElementById("title").value;
+      const artist = document.getElementById("artist").value;
+      const image = document.getElementById("image").value;
+      const link = document.getElementById("link").value;
+
+      if (!title || !artist || !image || !link) {
+        alert("يرجى ملء كل الحقول.");
+        return;
+      }
+
+      const newSong = { title, artist, image, link };
+      await push(songsRef, newSong);
+
+      document.getElementById("status").innerText = "تمت إضافة الأغنية بنجاح!";
+      document.getElementById("form").reset();
+    };
+
+    window.deleteSong = async function (id) {
+      if (confirm("هل أنت متأكد أنك تريد حذف هذه الأغنية؟")) {
+        await remove(ref(db, `songs/${id}`));
+      }
+    };
+
+    onValue(songsRef, (snapshot) => {
+      const container = document.getElementById("songsContainer");
+      container.innerHTML = "";
+      const songs = snapshot.val();
+      let count = 0;
+
+      for (const id in songs) {
+        const song = songs[id];
+        count++;
+
+        const songDiv = document.createElement("div");
+        songDiv.className = "bg-white shadow-md p-4 mb-4 rounded-lg transition hover:shadow-lg";
+
+        songDiv.innerHTML = `
+          <div class="flex justify-between items-center mb-2">
+            <div>
+              <p class="text-lg font-bold">${song.title}</p>
+              <p class="text-sm text-gray-500">${song.artist}</p>
+              <a href="${song.link}" target="_blank" class="text-blue-600 text-sm underline break-all">${song.link}</a>
+            </div>
+            <div class="flex items-center gap-2">
+              <img src="${song.image}" alt="صورة" class="w-14 h-14 rounded-lg object-cover border">
+              <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                onclick="event.stopPropagation(); deleteSong('${id}')">حذف</button>
+            </div>
+          </div>
+
+          <div class="hidden mt-3 border-t pt-3" id="player-${id}">
+            <div class="flex gap-4 items-center">
+              <img src="${song.image}" alt="صورة" class="w-16 h-16 rounded object-cover border" />
+              <div>
+                <h4 class="font-semibold">${song.title}</h4>
+                <p class="text-sm text-gray-500">${song.artist}</p>
+              </div>
+            </div>
+            <audio controls class="w-full mt-2">
+              <source src="${song.link}" type="audio/mpeg">
+              متصفحك لا يدعم تشغيل الصوت.
+            </audio>
+          </div>
+        `;
+
+        songDiv.addEventListener("click", () => {
+          document.querySelectorAll("[id^='player-']").forEach(p => p.classList.add("hidden"));
+          const player = songDiv.querySelector(`#player-${id}`);
+          player.classList.toggle("hidden");
+        });
+
+        container.appendChild(songDiv);
+      }
+
+      document.getElementById("count").innerText = `عدد الأغاني: ${count}`;
+    });
+  </script>
+
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  
-  
-  
-  
-  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="bg-gray-100 text-gray-900">
+<body class="bg-gradient-to-br from-yellow-50 to-white min-h-screen p-6">
+  <div class="max-w-xl mx-auto bg-white p-6 rounded-lg shadow" dir="rtl">
+    <h2 class="text-2xl font-bold mb-4 text-center text-yellow-700">إضافة أغنية جديدة</h2>
 
-<header id="headpage">
-  <div class="cursor-pointer" onclick="location.reload()">
-    <img style="width: 50px; height: 50px; margin-left: 10px;" src="https://yt3.googleusercontent.com/PgOaW_2z_TxX3InAAJ3NWLZdLkGXhfu8G2ImYS7Es-BKAQjD7RptWmd7LMLpVT8gZC1nDxZAiw=s160-c-k-c0x00ffffff-no-rj" alt="icon">
+    <form id="form" class="space-y-3">
+      <input id="title" type="text" placeholder="اسم الأغنية" class="border p-2 w-full rounded">
+      <input id="artist" type="text" placeholder="اسم المغني" class="border p-2 w-full rounded">
+      <input id="image" type="text" placeholder="رابط الصورة" class="border p-2 w-full rounded">
+      <input id="link" type="text" placeholder="رابط الأغنية (لينك خارجي)" class="border p-2 w-full rounded">
+      <button type="button" onclick="addSong()" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 w-full">إضافة</button>
+    </form>
+
+    <p id="status" class="mt-4 text-green-600 font-semibold text-center"></p>
   </div>
-  <h3 style="background-image: linear-gradient(60deg, #8DFAF4, #00A0E8); background-clip: text; color: transparent; font-family: sans-serif; font-weight: 900; font-size: 18px;" class="text-lg font-bold">Golden Vibe Music</h3>
-  
-  
-  
-  
-    
-    
-    
-    <div style="display: flex; widows: 100%; align-items: center; height: 100%; background: red;">
-      
 
-    <img id="menu" style="position: absolute; right: 17px; width: 35px; height: 35px;"   src="menu.png" alt="">
-    </div>
-    
-    
-    
-    
+  <div class="max-w-xl mx-auto mt-8">
+    <h3 id="count" class="text-xl font-bold mb-4 text-center text-gray-700">عدد الأغاني: 0</h3>
+    <div id="songsContainer"></div>
   </div>
-  
-  
-  
-</header>
-
-<main id="song" class="p-4 grid grd-cols-1 sm:grid-cols-2 gap-4">
-  <!-- سيتم تحميل الأغاني هنا -->
-</main>
-
-<div id="playerPopup" class="hidden fixed inset-0 backdrop-blur-md bg-white/20 flex justify-center items-center z-50">
-  <div class="bg-white p-6 rounded-lg shadow-lg w-11/12 max-w-md text-center relative text-black">
-    <button id="close-pop" onclick="closePopup()" class="absolute top-2 right-2 text-2xl font-bold text-red-500 hover:scale-110 transition">
-      <img  style="margin: 10px;width: 35px; height: 35px; margin: 10px;" src="cross.png" alt="إغلاق" />
-    </button>
-  
-  
-    <img style="margin-top: 40px;" id="popupImage" src="" class="w-32 h-32 mx-auto rounded-full mb-4 object-cover border-4 border-yellow-400" />
-    <h2 id="popupTitle" class="text-2xl font-bold mb-1"></h2>
-    <p id="popupArtist" class="mb-4"></p>
-
-    <div class="flex items-center justify-center gap-4 mb-4">
-      <button id="playPauseBtn" class="px-4 py-2 rounded-full font-semibold"></button>
-    </div>
-
-    <div class="flex items-center mt-2">
-      <span id="currentTime" class="text-sm">0:00</span>
-      <input style="margin-top: 20px;" type="range" id="progressBar" value="0" class="w-full h-2 bg-gray-200 rounded-full cursor-pointer accent-yellow-500 mx-2">
-      <span id="duration" class="text-sm">0:00</span>
-    </div>
-
-    <div class="flex justify-center mt-2">
-      <a id="downloadBtn" href="#" download class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">تحميل</a>
-    </div>
-
-    <div class="flex justify-center mt-4">
-      <img id="load" style="width: 40px; height: 40px;" src="loader.png" alt="تحميل" />
-      
-    </div>
-
-    <audio id="popupAudio" class="hidden">
-      <source id="popupSource" src="" type="audio/mpeg" />
-      متصفحك لا يدعم تشغيل الصوت.
-    </audio>
-  </div>
-</div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyA7rkzwhYa3eHarL9ozmui50_3eiWme-V0",
-    authDomain: "golden-vibes-music-hub.firebaseapp.com",
-    projectId: "golden-vibes-music-hub",
-    storageBucket: "golden-vibes-music-hub.appspot.com",
-    messagingSenderId: "1030337936174",
-    appId: "1:1030337936174:web:c177b4afb4b26ece4b98bf",
-    databaseURL: "https://golden-vibes-music-hub-default-rtdb.firebaseio.com/"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const songContainer = document.getElementById("song");
-  const audio = document.getElementById("popupAudio");
-  const playPauseBtn = document.getElementById("playPauseBtn");
-  const progressBar = document.getElementById("progressBar");
-  const currentTimeLabel = document.getElementById("currentTime");
-  const durationLabel = document.getElementById("duration");
-  const loader = document.getElementById("load");
-  const downloadBtn = document.getElementById("downloadBtn");
-
-  let isPlaying = false;
-
-  onValue(ref(db, "songs"), (snapshot) => {
-    const songs = snapshot.val();
-    songContainer.innerHTML = "";
-
-    if (!songs) {
-      songContainer.innerHTML = "<p class='text-center text-red-500'>لا توجد أغاني حالياً.</p>";
-      return;
-    }
-
-    for (let key in songs) {
-      const song = songs[key];
-      
-      
-  const div = document.createElement("div");
-  
-
-
-      
-      
-      
-      
-      div.className = "text-black flex flex-col items-center gap-2 p-3 rounded ";
-      
-      
-      
-      div.style.backgroundColor = "whitesmoke";
-
-
-    div.style.width = "47.5%";
-    div.style.borderRadius="10px"
-      
-      div.onclick = () => openPlayer(song);
-      div.innerHTML = `
-        <img id="imgtrue" src="${song.image}" alt="صورة" class="w-32 h-32 rounded object-cover border" />
-        <div class="text-center">
-          <h3 class="font-bold text-lg">${song.title}</h3>
-          <p style="color: #333333E3" >${song.artist}</p>
-        </div>
-      `;
-      songContainer.appendChild(div);
-    }
-  });
-
-  window.openPlayer = function (song) {
-    document.getElementById("popupImage").src = song.image;
-    document.getElementById("popupTitle").textContent = song.title;
-    document.getElementById("popupArtist").textContent = song.artist;
-    document.getElementById("popupSource").src = song.link;
-    downloadBtn.href = song.link;
-    downloadBtn.download = `${song.title}.mp3`;
-
-    audio.load();
-    loader.style.display = "block";
-    document.getElementById("playerPopup").classList.remove("hidden");
-    isPlaying = false;
-    playPauseBtn.style.backgroundImage = "url('play.png')";
-    playPauseBtn.style.backgroundSize = "cover";
-    playPauseBtn.style.width = "50px";
-    playPauseBtn.style.height = "50px";
-  };
-
-  window.closePopup = function () {
-    audio.pause();
-    document.getElementById("playerPopup").classList.add("hidden");
-  };
-
-  playPauseBtn.onclick = function () {
-    if (!isPlaying) {
-      audio.play();
-      playPauseBtn.style.backgroundImage = "url('pause.png')";
-      isPlaying = true;
-    } else {
-      audio.pause();
-      playPauseBtn.style.backgroundImage = "url('play.png')";
-      isPlaying = false;
-    }
-  };
-
-  audio.onended = function () {
-    playPauseBtn.style.backgroundImage = "url('play.png')";
-    isPlaying = false;
-  };
-
-  audio.addEventListener("loadstart", () => {
-    loader.style.display = "block";
-  });
-
-  audio.addEventListener("canplaythrough", () => {
-    loader.style.display = "none";
-  });
-
-  audio.ontimeupdate = () => {
-    const current = audio.currentTime;
-    const total = audio.duration || 0;
-    progressBar.value = total ? (current / total) * 100 : 0;
-    currentTimeLabel.textContent = formatTime(current);
-    durationLabel.textContent = formatTime(total);
-  };
-
-  progressBar.oninput = () => {
-    audio.currentTime = (progressBar.value / 100) * audio.duration;
-  };
-
-  function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? '0' + secs : secs}`;
-  }
-  
-  
-  
-  
-  
-  audio.addEventListener('loadstart', function () {
-  // أثناء تحميل الأغنية
-  var ing3 =  document.getElementById("load")
-
-
-ing3.classList.add("rotate")
-
-var db = document.getElementById('downloadBtn')
-
-db.style.display="none"
-
-});
-
-audio.addEventListener('canplaythrough', function () {
-  // بعد تحميل الأغنية بالكامل ويمكن تشغيلها
-  
-  
-  var ing3 =  document.getElementById("load")
-
-
-ing3.style.display="none"
-
-var db = document.getElementById('downloadBtn')
-
-
-db.style.display="block"
-
-
-});
-
-</script>
-
-
-
-
-
-<div id="menufull">
-  
-  
-  <div id="yotchannel">
-    
-    
-<img onclick="location.href='https://youtube.com/@goldenvibemusic?si=AHH1owwP4Sgoh9GP'" src="youtube.png" alt="" />
-    
-  </div>
-  
-  
-  <div id="share">
-<img id="sharetxt" src="send.png" alt="" />
-  </div>
-  
-  
-  
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-<script src="script.tsx"></script>
-
-
 </body>
 </html>
